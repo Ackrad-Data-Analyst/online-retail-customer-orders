@@ -1,0 +1,11 @@
+CustomerID,FirstName,LastName,City,State,IsLoyaltyMember
+1,Alicia,Nguyen,Oakland,CA,True
+2,Brandon,Lopez,Oakland,CA,False
+3,Carla,Patel,Berkeley,CA,True
+4,Diego,Martinez,San Francisco,CA,True
+5,Emma,Chen,San Francisco,CA,False
+6,Farah,Ali,San Jose,CA,True
+7,Gavin,Brown,Fremont,CA,False
+8,Hana,Singh,San Mateo,CA,True
+9,Isaac,Johnson,Alameda,CA,False
+10,Jade,Wilson,Berkeley,CA,True
