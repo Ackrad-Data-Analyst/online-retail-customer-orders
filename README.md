@@ -213,7 +213,7 @@ If you don’t have Access, you can still see the Top-5 result from the CSVs:
 
 ```bash
 # from repo root
-python scripts/top3_orders.py
+python scripts/top5_orders.py
 ```
 
 (This script currently implements a Top-5 ranking even though the filename still says “top3”.)
