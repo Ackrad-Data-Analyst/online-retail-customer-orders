@@ -17,5 +17,5 @@ CREATE TABLE [Order] (
   OrderDate DATETIME,
   FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
 );
--- Query: Top 3 most profitable orders
--- SELECT TOP 3 * FROM [Order] ORDER BY TotalProfit DESC;
+-- Query: Top 5 most profitable orders
+-- SELECT TOP 5 * FROM [Order] ORDER BY TotalProfit DESC;
