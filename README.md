@@ -1,18 +1,18 @@
-# Online Retail: Customer → Order Analytics (Top 3 Profit Orders)
+# Online Retail: Customer → Order Analytics (Top 5 Profit Orders)
 
 **Why this exists:** I wanted a tiny, clean retail dataset I could use to rank orders by profit and show how I think about schema design, SQL, and quick reporting. This repo is the working version I built in MS Access (plus CSVs + a small Python script so anyone can reproduce results without Access).
 
-[View data](data/) • [View SQL](sql/schema.sql) • [View script](scripts/top3_orders.py) • [Screenshots](docs/images/) • [Top-3 chart](docs/images/top3_orders.png)
+[View data](data/) • [View SQL](sql/schema.sql) • [View script](scripts/top3_orders.py) • [Screenshots](images/) • [Top-5 chart](images/top5_orders.png)
 
 ---
 
 ## TL;DR (Executive Summary)
 
-I modeled a simple **Customer → Order** database and built a report for the **Top 3 most profitable orders**. It’s a short, realistic example of how I go from requirements → schema → query → result. This reflects my background (B.Tech Civil Engineering + MSBA at Northeastern) and the roles I’m targeting (Business Analyst / Data Analyst / Data Engineer / Civil/GIS with analytics).
+I modeled a simple **Customer → Order** database and built a report for the **Top 5 most profitable orders**. It’s a short, realistic example of how I go from requirements → schema → query → result. This reflects my background (B.Tech Civil Engineering + MSBA at Northeastern) and the roles I’m targeting (Business Analyst / Data Analyst / Data Engineer / Civil/GIS with analytics).
 
-* **Result:** 1-click “Top 3” report for prioritizing high-profit orders
-* **Stack:** MS Access + SQL + CSVs + light Python for reproducibility
-* **What to look at first:** [Top-3 chart](docs/images/top3_orders.png), then [sql/schema.sql](sql/schema.sql)
+* **Result:** 1-click “Top 5” report for prioritizing high-profit orders  
+* **Stack:** MS Access + SQL + CSVs + light Python for reproducibility  
+* **What to look at first:** [Top-5 chart](images/top5_orders.png), then [sql/schema.sql](sql/schema.sql)
 
 ---
 
@@ -28,12 +28,16 @@ When fulfillment capacity is tight, **which orders should we ship first** to max
 
   * `TotalRevenue = NumProducts × UnitPrice`
   * `TotalProfit = (UnitPrice − UnitCost) × NumProducts`
-* A query/report that returns the **Top 3 most profitable orders**.
+
+* A query/report that returns the **Top 5 most profitable orders**.
+
 * A small reproducible pipeline so others can run the same logic without Access:
 
   * CSVs in [`/data`](data/)
-  * SQL DDL in [`/sql/schema.sql`](sql/schema.sql)
-  * Python helper in [`/scripts/top3_orders.py`](scripts/top3_orders.py)
+  * SQL DDL + queries in [`/sql/schema.sql`](sql/schema.sql)
+  * Python helper in [`/scripts/top3_orders.py`](scripts/top3_orders.py) (script name is legacy; logic returns Top 5)
+
+* An Excel view that creates the **Top 5 orders** chart exported as `images/top5_orders.png`.
 
 **Impact I’d expect in practice:** faster decision-making when teams need to prioritize shipments; potential **1–3% margin lift** during high-demand periods by handling the most profitable orders first.
 
@@ -41,22 +45,22 @@ When fulfillment capacity is tight, **which orders should we ship first** to max
 
 ## Repo Map (quick links)
 
-```
+```text
 data/           # CSV sources used to load the DB
   ├─ Customer.csv
   └─ Order.csv
 sql/            # DDL (and sample queries)
   └─ schema.sql
 scripts/        # lightweight reproducibility
-  └─ top3_orders.py
-docs/images/    # visuals used in this README
-  └─ top3_orders.png
-```
+  └─ top3_orders.py      # returns Top 5 orders in this version
+images/         # visuals used in this README
+  └─ top5_orders.png
+````
 
 * Data files: [Customer.csv](data/Customer.csv) • [Order.csv](data/Order.csv)
 * SQL: [schema.sql](sql/schema.sql)
 * Script: [top3_orders.py](scripts/top3_orders.py)
-* Visuals: [docs/images](docs/images/)
+* Visuals: [images](images/)
 
 ---
 
@@ -66,17 +70,27 @@ docs/images/    # visuals used in this README
 
    * `Customer(CustomerID PK)`
    * `Order(OrderID PK, CustomerID FK, NumProducts, UnitPrice, UnitCost, TotalRevenue, TotalProfit, OrderDate)`
-2. **Calculated fields**: I materialized `TotalRevenue` and `TotalProfit` (makes the report snappy; easy to recompute if needed).
-3. **Query & report**: Sorted by `TotalProfit` (DESC) and returned the **Top 3**.
-4. **Repro script**: [top3_orders.py](scripts/top3_orders.py) prints the same result from the CSVs.
+
+2. **Calculated fields**: I materialized `TotalRevenue` and `TotalProfit`
+   (makes the report snappy; easy to recompute if needed).
+
+3. **Query & report**: Sorted by `TotalProfit` (DESC) and returned the **Top 5** orders.
+
+4. **Repro script**: [top3_orders.py](scripts/top3_orders.py) loads the CSVs and prints the same Top 5 result from the flat files.
+
+5. **Excel chart (Top 5)**: Using the same structure, I built a pivot in Excel for the Top 5 most profitable orders and exported the chart as `images/top5_orders.png`.
 
 ---
 
 ## Screenshots / Results
 
-* Top-3 chart: ![Top 3 Orders](docs/images/top3_orders.png)
+### Top-5 Profit Orders
 
-(If you’re viewing this on GitHub, you’ll see the chart. The Access report + relationship screenshots belong here too—once I export them I’ll drop them into [`docs/images/`](docs/images/) and reference them.)
+This chart shows the **Top 5 most profitable orders** (based on `TotalProfit`):
+
+![Top 5 Orders](images/top5_orders.png)
+
+It gives operations a simple “ship these first” list when capacity is limited.
 
 ---
 
@@ -109,10 +123,10 @@ CREATE TABLE [Order] (
 );
 ```
 
-### Query 1 — **Top 3 most profitable orders** (the core use-case)
+### Query 1 — **Top 5 most profitable orders** (the core use-case)
 
 ```sql
-SELECT TOP 3
+SELECT TOP 5
     OrderID,
     CustomerID,
     NumProducts,
@@ -130,7 +144,7 @@ ORDER BY TotalProfit DESC;
 ### Query 2 — **Top profit orders with customer name** (friendlier output)
 
 ```sql
-SELECT TOP 3
+SELECT TOP 5
     o.OrderID,
     c.FirstName & ' ' & c.LastName AS CustomerName,
     o.TotalProfit,
@@ -189,20 +203,20 @@ ORDER BY Profit DESC;
 
 **Why:** is the loyalty program worth it?
 
-> If you’re running these in Access’s **Design View**, set **Sort = Descending** for `TotalProfit` and use **Top Values = 3** for the Top-3 query.
+> If you’re running these in Access’s **Design View**, set **Sort = Descending** for `TotalProfit` and use **Top Values = 5** for the Top-5 query.
 
 ---
 
 ## Reproduce without Access (quick)
 
-If you don’t have Access, you can still see the Top-3 result from the CSVs:
+If you don’t have Access, you can still see the Top-5 result from the CSVs:
 
 ```bash
 # from repo root
 python scripts/top3_orders.py
 ```
 
-This prints the same top 3 rows based on `TotalProfit`.
+(This script currently implements a Top-5 ranking even though the filename still says “top3”.)
 
 ---
 
@@ -210,6 +224,7 @@ This prints the same top 3 rows based on `TotalProfit`.
 
 * **SQL (MS Access)**, relational modeling, simple KPIs
 * Light **Python** for reproducibility
+* **Excel** for quick ranking visuals (Top 5 orders)
 * Communicating business value clearly (why this query/report matters)
 
 This mirrors the work I like doing in Business Analyst / Data Analyst roles and translates well to **data engineering** (schemas + loading) and **civil/GIS** contexts (this same pattern works for routing, job prioritization, and capacity problems).
@@ -231,4 +246,3 @@ This mirrors the work I like doing in Business Analyst / Data Analyst roles and 
 * All data in `/data` is mock/sample for portfolio purposes.
 * Access uses square brackets for reserved words like `[Order]`.
 
----
